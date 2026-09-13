@@ -39,7 +39,7 @@ func weapon_summary():
 	return " · ".join(names)
 
 func kind_for_wave():
-	var pools = [[0],[0,1,1],[1,2,5,5],[2,3,5,5],[3,4,5,5,5],[3,4,5,5,5]]
+	var pools = [[0],[0,1,1],[0,0,2,2,1,1,1,1,5],[0,2,2,2,1,1,3,3,5],[2,2,2,1,3,3,3,4,4,5],[2,2,2,1,3,3,3,4,4,5]]
 	var pool = pools[mini(game.wave-1,5)]
 	return pool[game.rng.randi_range(0,pool.size()-1)]
 
@@ -140,6 +140,7 @@ func spawn_enemy(kind = -1, boss = false):
 	var health = game.box(node,Vector3(0,3.1 if boss else 1.85,0),Vector3(1.0,0.09,0.07),game.RED)
 	health.visible = boss
 	var hp = 600.0 if boss else (18.0+game.wave*3.5)*[1.0,1.3,0.8,2.8,1.1,1.8][kind]
+	if kind == 5: hp = 60.0+clampi(game.wave-3,0,3)*3.0
 	hp *= game.run_difficulty[1]
 	var e = {"id":id_counter,"node":node,"model":art.model,"body":art.body,"color":art.color,"kind":kind,"boss":boss,"hp":hp,"max_hp":hp,"path":[],"repath":0.0,"hit":0.0,"attack":0.0,"recover":0.3,"danger":danger,"health":health,"slow":0.0}
 	id_counter += 1
@@ -356,6 +357,8 @@ func make_cloud():
 
 func hurt(e, amount):
 	if e.hp<=0: return
+	# Human armor guarantees at least three damaging hits, even with upgraded weapons.
+	if e.kind == 5: amount = minf(amount,e.max_hp*0.34)
 	e.hp -= amount
 	e.hit = 0.12
 	if e.hp<=0:

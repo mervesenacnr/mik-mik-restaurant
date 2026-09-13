@@ -62,7 +62,7 @@ Düşmanlar iki kapıdan tek tek değil, karakterin çevresindeki sekiz sektörd
 | 2 | Kedi ve sokak köpeği |
 | 3 | Kara kediler ve sopalı insanlar |
 | 4 | Zırhlı buldoglar ve sopalı insanlar |
-| 5 | Tilkiler ve daha kalabalık insan grupları |
+| 5 | Tilkiler ve seyrek sopalı insanlar |
 | 6 | Karışık alfa sürüsü ve Kazan Kıran adlı büyük buldog |
 
 Hayvanlar mobilyaları dolaşır ve birbirlerinden ayrılarak yaklaşır. Kırmızı halka, kısa hazırlıktan sonra gerçekleşecek saldırıyı gösterir. Dash veya hareketle dışına çık. Hasardan sonra kısa dokunulmazlık vardır.
@@ -135,3 +135,5 @@ Masalara örtü şeridi, kenar halkası, peçete, çatal, baharatlık ve işleme
 Özel repo: https://github.com/mervesenacnr/mik-mik-restaurant . `mervesenacnr` repo sahibidir. İlk aktarım `main` üzerindedir; sonraki her güncelleme yeni bir `codex/<değişiklik>` branch üzerinde test edilip commit ve push edilir. Merge ve görünürlük değişikliği ayrıca istenmedikçe yapılmaz. Çalışma tercihi `AGENTS.md` içinde de kayıtlıdır.
 
 Yüzler, kıyafet ayrıntıları, saksılar ve masa süslemeleri önbellekli birleştirilmiş geometri kullanır. Müşteri yüzleri koşu başlamadan hazırlanır; yeni müşteri geldiğinde ilk kez geometri birleştirme yükü oluşmaz.
+
+Sopalı insanlar üçüncü vardiyadan itibaren doğum havuzunun yaklaşık %10–11’ini oluşturur; kedi ve köpekler sayıca baskındır. Normal zorlukta insan canı 60–69’dur: başlangıç sodasıyla 5, birinci seviye bıçak/tavayla 3 isabet gerekir. İnsan zırhı tek hasar olayını azami canın %34’üyle sınırlar; yüksek geliştirmelerle de tek veya iki vuruşta ölmezler. Alan hasarı tikleri ayrı hasar olaylarıdır; zor modlarda artan can nedeniyle düşük hasarlı silahlar daha fazla isabet gerektirebilir.
