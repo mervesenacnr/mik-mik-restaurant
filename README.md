@@ -137,3 +137,14 @@ Masalara örtü şeridi, kenar halkası, peçete, çatal, baharatlık ve işleme
 Yüzler, kıyafet ayrıntıları, saksılar ve masa süslemeleri önbellekli birleştirilmiş geometri kullanır. Müşteri yüzleri koşu başlamadan hazırlanır; yeni müşteri geldiğinde ilk kez geometri birleştirme yükü oluşmaz.
 
 Sopalı insanlar üçüncü vardiyadan itibaren doğum havuzunun yaklaşık %10–11’ini oluşturur; kedi ve köpekler sayıca baskındır. Normal zorlukta insan canı 60–69’dur: başlangıç sodasıyla 5, birinci seviye bıçak/tavayla 3 isabet gerekir. İnsan zırhı tek hasar olayını azami canın %34’üyle sınırlar; yüksek geliştirmelerle de tek veya iki vuruşta ölmezler. Alan hasarı tikleri ayrı hasar olaylarıdır; zor modlarda artan can nedeniyle düşük hasarlı silahlar daha fazla isabet gerektirebilir.
+
+## Servis ve savaş animasyonları
+
+- Serviste şef kollarını uzatır; tabak yay çizerek masaya gelir, inişte hafifçe esner ve küçük parçacıklar çıkar. Müşteri tabak inmeden kaşığı kaldırmaz.
+- Bekleyen müşteriler etrafa bakar, ayak vurur, ellerini yüzüne götürür ve esner. Sabır düştükçe kıpırdanma artar; yürüyüşte kol ve ayak hareketleri vardır.
+- Yemekte el–ağız hareketi, kaşık, yemeğe uygun lokma rengi, çiğneme/ağız hareketi ve azalan porsiyonlar görünür.
+- Yemek sonunda müşteri kısa süre durup ödeme hareketi yapar. Üç para masaya düşüp seker, ardından otomatik olarak şefe uçar; toplama hareketi, ses ve miktar yazısı oynar. Para/XP/bahşiş ödülü mantıksal olarak yemek bitiminde bir kez verilir; görsel toplama ikinci ödül üretmez.
+- Şef soda ve bıçak atarken elindeki eşya ve kol hareketi görünür. İsabetler küçük parıltı, ezilme ve sendeleme yaratır. Hayvanlar saldırıda öne atılır, insanlar sopayı savurur. Yenilen düşmanlar savaş listesinden hemen çıkarılır, kısa devrilme/küçülme animasyonuyla kaybolur; tekrar vurulamaz ve tekrar XP vermez.
+- Bütün bu animasyonlar ESC ve yükseltme seçiminde donar. Darbe efektleri yeniden kullanılır; eşzamanlı efekt ve ölüm sayıları sınırlıdır.
+
+`tests/animation_test.gd` servis sırası, bekleme, ödeme/toplama, duraklama, silah hareketi, kedi/köpek/insan isabet ve ölüm animasyonları ile tek seferlik ödülleri doğrular. `tests/animation_preview.gd` yakın çekim görsel doğrulama sahnelerini oluşturur; gerçek oyunun kamera boyutunu değiştirmez.

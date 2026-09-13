@@ -153,6 +153,9 @@ var combat_xp_label: Label
 var kitchen_xp_label: Label
 var weapon_label: Label
 var indicators
+var action_fx
+var strike_left = 0.0
+var strike_kind = "soda"
 var profile
 var profile_menu
 var run_initialized = false
@@ -181,6 +184,9 @@ func _ready():
 	monsters = MonsterSystem.new()
 	add_child(monsters)
 	monsters.setup(self)
+	action_fx = preload("res://scripts/action_effects.gd").new()
+	add_child(action_fx)
+	action_fx.setup(self)
 	# Warm each customer face and coat before the run, avoiding mesh baking during an arrival.
 	for i in range(4):
 		var warm = animal(world,Color("c4ad91"),[Color("6d939e"),GOLD,Color("b7a1c9"),MINT][i],false,["round","sharp","sleepy","oval"][i])
@@ -466,6 +472,7 @@ func make_table(pos, index):
 	var food = FoodVisual.new()
 	root.add_child(food)
 	food.setup(index % 4)
+	food.landed.connect(func(): action_fx.impact(pos+Vector3(0,1.35,0),CREAM))
 	food.position = Vector3(0,1.32,0.15)
 	food.visible = false
 	var patience_bg = box(root,Vector3(0,2.14,0),Vector3(1.3,0.1,0.07),INK)
@@ -557,7 +564,9 @@ func animal(parent, fur, coat, chef = false, eye_override = ""):
 		for x in [-0.17,0,0.17]: sphere(head,Vector3(x,0.74,0),Vector3(0.34,0.33,0.4),CREAM)
 		box(n,Vector3(0,1,-0.34),Vector3(0.25,0.1,0.1),GOLD)
 		n.set_meta("chef_hat",head.get_children().slice(head_before))
-	n.set_meta("rig",{"head":head,"arms":arms,"jaw":jaw,"spoon":spoon,"morsel":morsel,"feet":feet,"eyes":eyes,"ears":ears})
+	var mouth = sphere(head,Vector3(0,-.105,-.552),Vector3(.16,.018,.04),INK)
+	mouth.visible = false
+	n.set_meta("rig",{"head":head,"arms":arms,"jaw":jaw,"spoon":spoon,"morsel":morsel,"feet":feet,"eyes":eyes,"ears":ears,"mouth":mouth})
 	if chef:
 		var pad = box(arms[0],Vector3(0,-0.45,-0.07),Vector3(0.29,0.36,0.04),CREAM)
 		pad.visible = false
@@ -565,6 +574,18 @@ func animal(parent, fur, coat, chef = false, eye_override = ""):
 		sponge.visible = false
 		n.get_meta("rig")["pad"] = pad
 		n.get_meta("rig")["sponge"] = sponge
+		var knife = ArtDetail.root_at(arms[1])
+		box(knife,Vector3(0,-.49,-.04),Vector3(.10,.19,.09),Color("925c3f"))
+		box(knife,Vector3(0,-.75,-.04),Vector3(.11,.36,.035),CREAM)
+		ArtDetail.bake(knife,"held_knife")
+		knife.visible = false
+		var soda = ArtDetail.root_at(arms[1])
+		cylinder(soda,Vector3(0,-.47,-.08),.075,.26,MINT)
+		cylinder(soda,Vector3(0,-.3,-.08),.04,.10,CREAM)
+		ArtDetail.bake(soda,"held_soda")
+		soda.visible = false
+		n.get_meta("rig")["knife"] = knife
+		n.get_meta("rig")["soda"] = soda
 	ArtDetail.tailoring(self,n,coat)
 	if not chef: ArtDetail.face(self,n,fur,eye_override if eye_override != "" else ["round","sharp","sleepy","oval"][guests.size()%4])
 	return n
@@ -575,9 +596,14 @@ func reset_animal_pose(model):
 	rig.jaw.scale = Vector3(0.42,0.3,0.34)
 	for arm in rig.arms: arm.rotation = Vector3.ZERO
 	rig.spoon.visible = false
+	rig.mouth.visible = false
+	for foot in rig.feet: foot.position.y = .12
+	model.rotation.z = 0
 	if rig.has("pad"):
 		rig.pad.visible = false
 		rig.sponge.visible = false
+		rig.knife.visible = false
+		rig.soda.visible = false
 	model.position.y = 0
 
 func animate_eating(g, t):
@@ -591,8 +617,12 @@ func animate_eating(g, t):
 	rig.head.rotation.z = sin(t.eat_age*2)*0.035
 	var chew = maxf(0,sin((cycle-0.5)*TAU*5)) if cycle>0.5 and cycle<0.88 else 0.0
 	rig.jaw.scale = Vector3(0.42+chew*0.045,0.3-chew*0.035,0.34)
+	rig.mouth.visible = chew>0
+	rig.mouth.scale.y = .018+chew*.045
+	for i in range(rig.feet.size()): rig.feet[i].position.y = .12+maxf(0,sin(t.eat_age*5+i))*.03
 	rig.spoon.visible = true
 	rig.morsel.visible = cycle>0.12 and cycle<0.6
+	rig.morsel.material_override.albedo_color = [Color("dba64d"),Color("efba51"),Color("e69a42"),GOLD][t.dish]
 	g.model.position.y = 0.08+sin(cycle*TAU)*0.025
 	var bite = int((t.eat_age+0.35)/0.95)
 	if bite > t.last_bite:
@@ -901,6 +931,7 @@ func _process(delta):
 	var active = running and not paused and not choosing and not ended
 	var visual_delta = delta if active else 0.0
 	elapsed += visual_delta
+	if action_fx != null: action_fx.advance(visual_delta)
 	for p in particles.duplicate():
 		p.life -= visual_delta
 		p.node.position.y += visual_delta*1.2
@@ -913,7 +944,9 @@ func _process(delta):
 		toast_label.modulate.a = minf(1,toast_time)
 	if running and not paused and not choosing and not ended:
 		tick_game(delta)
-		if not choosing and not ended: animate_power(delta)
+		if not choosing and not ended:
+			animate_strike(delta)
+			animate_power(delta)
 		update_camera(delta)
 		update_hud()
 	if indicators != null: indicators.refresh()
@@ -984,10 +1017,21 @@ func assign_table(g):
 
 func update_guests(delta):
 	for g in guests.duplicate():
+		if g.get("pay_left",0)>0:
+			g.pay_left = maxf(0,g.pay_left-delta)
+			var rig = g.model.get_meta("rig")
+			var reach = sin((.6-g.pay_left)/.6*PI)
+			rig.arms[1].rotation.x = 1.3*reach
+			rig.head.rotation.x = .15*reach
+			if g.pay_left<=0:
+				reset_animal_pose(g.model)
+				g.node.position.y = 0
+			continue
 		if g.state == "queue":
 			if not assign_table(g):
 				g.patience -= delta*0.5
 				g.seat_wait += delta
+				animate_waiting(g,delta)
 				g.node.position.x = sin(g.seat_wait)*0.25 + (guests.find(g)%4-1.5)*0.8
 				if g.patience <= 0: lose_guest(g)
 		elif g.state == "walking" or g.state == "leaving":
@@ -999,11 +1043,16 @@ func update_guests(delta):
 					g.node.position = g.node.position.move_toward(target,delta*2.8)
 					g.model.rotation.y = lerp_angle(g.model.rotation.y,atan2(-dir.x,-dir.z),delta*12)
 					g.model.position.y = absf(sin(elapsed*12))*0.045
+					var walk = g.model.get_meta("rig")
+					for i in range(2):
+						walk.feet[i].position.y = .12+maxf(0,sin(elapsed*12+i*PI))*.08
+						walk.arms[i].rotation.x = sin(elapsed*12+i*PI)*.2
 			else:
 				if g.state == "leaving":
 					g.node.queue_free()
 					guests.erase(g)
 				else:
+					reset_animal_pose(g.model)
 					g.state = "seated"
 					g.model.rotation.y = -PI/2 if tables[g.table].pos.x<0 else PI/2
 					g.node.position.y = 0.28
@@ -1012,6 +1061,7 @@ func update_guests(delta):
 			var t = tables[g.table]
 			if t.state in ["order","cooking","ready"]:
 				g.patience -= delta
+				animate_waiting(g,delta)
 				if g.patience <= 0: lose_guest(g)
 
 func lose_guest(g):
@@ -1058,8 +1108,8 @@ func update_tables(delta):
 		if t.state == "eating":
 			t.progress -= delta
 			t.eat_age += delta
-			animate_eating(t.guest,t)
 			t.food.advance(delta,maxf(0,t.progress/t.eat_duration))
+			if not t.food.flying: animate_eating(t.guest,t)
 			if t.progress <= 0: complete_meal(i)
 		if t.state == "dirty":
 			t.food.advance(delta,0,false)
@@ -1111,6 +1161,7 @@ func auto_service(delta):
 			t.eat_age = 0
 			t.last_bite = 0
 			t.food.visible = true
+			reset_animal_pose(t.guest.model)
 			t.food.serve_from(t.root.to_local(player.position+Vector3(0.5,1.3,-0.4)))
 			monsters.service_burst(t.pos)
 			status_label.text = "Afiyet olsun!"
@@ -1131,6 +1182,16 @@ func animate_action(kind):
 	action_pose = kind
 	if power_time>0: return
 	var rig = mouse_model.get_meta("rig")
+	rig.knife.visible = false
+	rig.soda.visible = false
+	if kind in ["ready","collect"]:
+		var reach = sin(clampf(1-gesture_left/.45,0,1)*PI)
+		rig.arms[0].rotation.x = .8+reach*.45
+		rig.arms[1].rotation.x = 1.1+reach*.6
+		rig.head.rotation.x = .18*reach
+		rig.pad.visible = false
+		rig.sponge.visible = false
+		return
 	rig.pad.visible = kind == "order"
 	rig.sponge.visible = kind == "dirty"
 	var arms = rig.arms
@@ -1151,9 +1212,10 @@ func complete_meal(i):
 	add_xp(3 if g.kind == "student" else 2)
 	health = minf(max_health,health+4)
 	rep = minf(100,rep+(6 if g.kind == "regular" else 1))
-	floating_text("+%d" % tip,t.pos+Vector3(0,2.5,0),GOLD)
 	reset_animal_pose(g.model)
-	g.node.position.y = 0
+	var coin_at = t.pos+Vector3(-.65 if t.pos.x<0 else .65,1.4,.45)
+	action_fx.tip(coin_at,g.model.get_meta("rig").arms[1].to_global(Vector3(0,-.38,0)),tip)
+	g.pay_left = .6
 	g.state = "leaving"
 	g.path = path_between(g.node.position,Vector3(0,0,8))
 	t.guest = null
@@ -1182,6 +1244,7 @@ func damage_chef(amount):
 	if dash_time>0 or hurt_left>0 or ended: return
 	health = maxf(0,health-amount)
 	hurt_left = 0.95
+	action_fx.impact(player.position+Vector3(0,1.2,0),CORAL)
 	floating_text("−%d" % int(amount),player.position+Vector3(0,2.1,0),CORAL)
 	tone(150,0.1,0.05)
 
@@ -1201,6 +1264,7 @@ func set_table_dish(t, kind):
 	t.food = FoodVisual.new()
 	t.root.add_child(t.food)
 	t.food.setup(kind)
+	t.food.landed.connect(func(): action_fx.impact(t.pos+Vector3(0,1.35,0),CREAM))
 	t.food.position = Vector3(0,1.32,0.15)
 	t.food.visible = false
 
@@ -1541,3 +1605,40 @@ func smoke_test():
 	assert(ended and not running,"Loss stops gameplay")
 	print("SMOKE PASS: WASD movement, Space dash, table collision, navigation, automatic order/cook/pickup/serve/clean, rewards, all upgrades, waves, customer loss, game over")
 	get_tree().quit()
+
+func animate_waiting(g, delta):
+	g["wait_age"] = g.get("wait_age",0.0)+delta
+	var age = g.wait_age
+	var impatience = clampf(1-g.patience/g.max_patience,0,1)
+	var rig = g.model.get_meta("rig")
+	rig.spoon.visible = false
+	rig.head.rotation.y = sin(age*.8)*(.12+impatience*.28)
+	rig.head.rotation.x = .07+impatience*.16
+	rig.head.rotation.z = sin(age*1.1)*.06
+	rig.arms[0].rotation.x = .6+impatience*.5
+	rig.arms[1].rotation.x = 1.65+sin(age*(4+impatience*6))*.12
+	for i in range(2): rig.feet[i].position.y = .12+maxf(0,sin(age*(5+impatience*8)+i*PI))*(.015+impatience*.11)
+	g.model.rotation.z = sin(age*2)*impatience*.045
+	var yawn = maxf(0,sin(clampf((fmod(age,9)-7)/2,0,1)*PI))
+	rig.mouth.visible = yawn>.05
+	rig.mouth.scale.y = .018+yawn*.13
+	if yawn>.05:
+		rig.head.rotation.x = -.15*yawn
+		rig.arms[1].rotation.x = 2.0
+
+func swing_chef(kind):
+	strike_left = .24
+	strike_kind = kind
+
+func animate_strike(delta):
+	if strike_left<=0: return
+	strike_left = maxf(0,strike_left-delta)
+	if action_pose != "" or gesture_left>0 or power_time>0: return
+	var rig = mouse_model.get_meta("rig")
+	rig.knife.visible = strike_kind == "knife"
+	rig.soda.visible = strike_kind == "soda"
+	var pulse = sin((1-strike_left/.24)*PI)
+	rig.arms[1].rotation.x = pulse*(1.6 if strike_kind == "knife" else 1.1)
+	rig.arms[1].rotation.z = -.45*pulse
+	rig.head.rotation.z = .06*pulse
+	if strike_left<=0: reset_animal_pose(mouse_model)

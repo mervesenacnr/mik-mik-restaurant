@@ -4,6 +4,9 @@ extends Node3D
 const ArtDetail = preload("res://scripts/art_detail.gd")
 static var portion_cache: Dictionary = {}
 const NAMES = ["Peynir burger", "Sebzeli pizza", "Balkabağı çorbası", "Peynir tabağı"]
+signal landed
+var landing_left = 0.0
+var flight_scale = Vector3.ONE
 var kind = 0
 var portions: Array = []
 var steam: Array = []
@@ -187,6 +190,8 @@ func make_cheese():
 
 func serve_from(local_origin):
 	resting_at = position
+	flight_scale = scale
+	landing_left = 0
 	flight_from = local_origin
 	flight_age = 0
 	flying = true
@@ -200,10 +205,18 @@ func advance(delta, remaining = 1.0, hot = true):
 		var t = minf(1,flight_age/0.42)
 		position = flight_from.lerp(resting_at,t)+Vector3.UP*sin(t*PI)*0.55
 		rotation.z = sin(t*PI)*0.12
+		scale = flight_scale*(.88+.12*t)
 		if t >= 1:
 			flying = false
 			position = resting_at
 			rotation.z = 0
+			scale = flight_scale
+			landing_left = .22
+			landed.emit()
+	if not flying and landing_left>0:
+		landing_left = maxf(0,landing_left-delta)
+		var settle = sin((1-landing_left/.22)*PI)
+		scale = flight_scale*Vector3(1+settle*.06,1-settle*.10,1+settle*.06)
 	for i in range(portions.size()):
 		portions[i].visible = i < ceili(fraction*portions.size())
 		if kind == 2: portions[i].position.y = 0.165+0.129*fraction

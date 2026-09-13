@@ -142,7 +142,7 @@ func spawn_enemy(kind = -1, boss = false):
 	var hp = 600.0 if boss else (18.0+game.wave*3.5)*[1.0,1.3,0.8,2.8,1.1,1.8][kind]
 	if kind == 5: hp = 60.0+clampi(game.wave-3,0,3)*3.0
 	hp *= game.run_difficulty[1]
-	var e = {"id":id_counter,"node":node,"model":art.model,"body":art.body,"color":art.color,"kind":kind,"boss":boss,"hp":hp,"max_hp":hp,"path":[],"repath":0.0,"hit":0.0,"attack":0.0,"recover":0.3,"danger":danger,"health":health,"slow":0.0}
+	var e = {"id":id_counter,"node":node,"model":art.model,"body":art.body,"color":art.color,"kind":kind,"boss":boss,"hp":hp,"max_hp":hp,"path":[],"repath":0.0,"hit":0.0,"attack":0.0,"recover":0.3,"danger":danger,"health":health,"slow":0.0,"swing":0.0}
 	id_counter += 1
 	enemies.append(e)
 	if boss:
@@ -174,6 +174,7 @@ func update(delta):
 	for e in enemies.duplicate():
 		if e.hp<=0: continue
 		e.hit = maxf(0,e.hit-delta)
+		e.swing = maxf(0,e.swing-delta)
 		e.slow = maxf(0,e.slow-delta)
 		e.recover = maxf(0,e.recover-delta)
 		e.body.material_override.albedo_color = game.CREAM if e.hit>0 else e.color
@@ -186,16 +187,23 @@ func update(delta):
 			e.danger.scale = Vector3.ONE*(0.6+(1-e.attack/0.6)*0.65)*(1.5 if e.boss else 1.0)
 			if e.attack<=0:
 				if distance<(2.2 if e.boss else 1.3): game.damage_chef((22 if e.boss else 7)*game.run_difficulty[2])
+				e.swing = .24
+				game.action_fx.impact(e.node.position+Vector3.FORWARD.rotated(Vector3.UP,e.model.rotation.y)*.6+Vector3.UP,game.CORAL)
 				e.recover = 1.1
 				e.danger.visible = false
 		elif distance<(1.9 if e.boss else 1.05) and e.recover<=0: e.attack = 0.6
 		else: move_enemy(e,delta)
 		var scale_factor = 2.0 if e.boss else (1.15 if e.kind == 3 else 0.82)
-		e.model.scale = Vector3.ONE*scale_factor
-		e.model.position.y = absf(sin(age*8+e.id))*0.055
+		var flinch = sin(clampf(e.hit/.18,0,1)*PI)
+		var swing = sin(clampf(e.swing/.24,0,1)*PI)
+		e.model.scale = Vector3(1+flinch*.18,1-flinch*.16,1+flinch*.1)*scale_factor
+		e.model.rotation.z = flinch*.2*(1 if e.id%2 == 0 else -1)
+		e.model.rotation.x = -.12*swing if e.kind != 5 else 0
+		e.model.position = Vector3.FORWARD.rotated(Vector3.UP,e.model.rotation.y)*(swing*.35-flinch*.12)
+		e.model.position.y = absf(sin(age*8+e.id))*.055+swing*.08
 		if e.kind == 5:
 			var arm = e.model.get_meta("club_arm")
-			arm.rotation.x = -2.5*(e.attack/0.6) if e.attack>0 else sin(age*10+e.id)*0.35
+			arm.rotation.x = -2.5*(e.attack/0.6) if e.attack>0 else (swing*1.1 if e.swing>0 else sin(age*10+e.id)*0.35)
 		var legs = e.model.get_meta("legs")
 		for i in range(legs.size()): legs[i].rotation.x = sin(age*10+e.id+(i%2)*PI)*0.33
 	update_weapons(delta)
@@ -259,12 +267,14 @@ func upgrade_weapon(id):
 			pans.append(p)
 
 func fire_at(e):
+	game.swing_chef("soda")
 	var origin = game.player.position+Vector3(0.35,1.15,-0.15)
 	var n = game.sphere(self,origin,Vector3.ONE*0.23,Color("8ce8e3"))
 	n.material_override.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	shots.append({"node":n,"target":e,"life":1.5,"kind":"soda"})
 
 func fire_knives(target):
+	game.swing_chef("knife")
 	var count = mini(4,game.perks.knife)
 	var direction = (target.node.position-game.player.position).normalized()
 	for i in range(count):
@@ -360,7 +370,8 @@ func hurt(e, amount):
 	# Human armor guarantees at least three damaging hits, even with upgraded weapons.
 	if e.kind == 5: amount = minf(amount,e.max_hp*0.34)
 	e.hp -= amount
-	e.hit = 0.12
+	e.hit = 0.18
+	game.action_fx.impact(e.node.position+Vector3(0,1,0),game.CREAM)
 	if e.hp<=0:
 		kills += 1
 		game.profile.record("kills")
@@ -370,7 +381,7 @@ func hurt(e, amount):
 		game.add_combat_xp(30 if e.boss else 8 if e.kind == 3 else 4)
 		game.puff(e.node.position+Vector3(0,0.8,0),Color("bdacec"))
 		enemies.erase(e)
-		e.node.queue_free()
+		game.action_fx.death(e)
 
 func service_burst(at):
 	if not game.perks.has("bell"): return
