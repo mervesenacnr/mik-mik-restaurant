@@ -2,7 +2,7 @@
 
 ## GitHub workflow (explicit user preference)
 
-- Repository: `mervesenacnr/mik-mik-restaurant`; keep it PRIVATE.
+- Repository: `mervesenacnr/mik-mik-restaurant`; PUBLIC and source-available under the PolyForm Noncommercial License 1.0.0. Commercial use requires separate written permission from both project owners: Merve Sena Çınar and Ali Erdem Cerrah.
 - The initial project import may be on `main`.
 - For each subsequent update, create a NEW descriptive `codex/<change>` branch before editing. Do not reuse a previous feature branch or commit updates directly to `main`.
 - Validate the change, commit the relevant project files, then push the new branch to this private repository. The user has explicitly authorized this routine branch-and-push workflow; do not request permission again.
