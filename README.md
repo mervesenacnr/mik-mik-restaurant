@@ -1,137 +1,128 @@
-# Mik Mik · Lunch Rush
+# Mik Mik - Lunch Rush (Godot Edition)
+A playable, single-player, top-down 3D restaurant-management and swarm-survival roguelike prototype built with Godot 4.7.1 and GDScript. Play as a mouse chef, serve customers, and survive waves of cats, dogs, and other enemies. Restaurant tasks and weapons operate automatically while you manage movement, positioning, and upgrades.
 
-Godot 4.7.1 ile yapılmış tek oyunculu, üstten açılı 3D restoran/sürü savunma roguelike prototipi. Fare şefle servis yaparken çevrenden gelen kedi ve köpek sürülerinden kaçarsın. Tüm restoran işlemleri ve silahlar otomatik çalışır.
+**Project owners:** Merve Sena Çınar & Ali Erdem Cerrah
+**Other implementation:** Mik Mik - Three.js Edition
 
-## Oyna
+## Getting started
+Run Oyna.command on macOS, or open project.godot in Godot and press F5. From the main menu, select Mutfağı aç (Open the Kitchen).
+- WASD / arrow keys: Move.
+- Space: Dash, with damage protection during the dash.
+- Esc: Open or close the pause menu. Mandatory upgrade choices cannot be skipped.
+- Mouse: Select kitchen or combat upgrade cards.
+- Top-right buttons: Break and sound controls.
 
-`Oyna.command` dosyasını çalıştır veya `project.godot` dosyasını Godot ile açıp F5 kullan. Menüde **Mutfağı aç** düğmesine tıkla.
+## Mouse characters, customization, and persistent progression
+The main menu has three tabs: Fareler & stil (Mice & Style), Başlangıç statları (Starting Stats), and Başarımlar (Achievements). All playable characters are mice. Fur and outfit colors can be selected from four coordinated palettes each, with instant updates in the 3D preview. Four eye shapes are available: round, sharp, sleepy, and oval. Color, eye shape, character, clothing, and difficulty selections are saved. Older RGB profile values are mapped to the nearest palette color.
 
-- **WASD veya yön tuşları:** hareket.
-- **Space:** dash; dash boyunca hasar koruması.
-- **ESC:** duraklatma menüsünü aç/kapat. Zorunlu yükseltme seçimini atlamaz.
-- **Fareyle kart seç:** mutfak veya savaş yükseltmesi.
-- Sağ üst düğmeler: mola ve ses.
-
-## Fareler, kıyafetler ve kalıcı ilerleme
-
-Başlangıç menüsünde üç sekme bulunur: **Fareler & stil**, **Başlangıç statları**, **Başarımlar**. Tüm karakterler faredir; tüy ve kıyafet rengi dörder uyumlu paletten seçilir, 3D önizleme anında güncellenir. Dört göz şekli (yuvarlak, keskin, uykulu, oval) seçilebilir. Renkler, göz şekli, karakter, kıyafet ve zorluk seçimi kaydedilir. Eski RGB kayıtları en yakın palet rengine taşınır.
-
-| Fare | Başlangıç özelliği | Açılış |
+| Character | Starting trait | Unlock condition |
 | --- | --- | --- |
-| Mik | Dengeli başlangıç | Başlangıçta açık |
-| Zıp | %15 hızlı, +1 tabak | Toplam 10 servis |
-| Tok | +24 can, %15 silah hasarı, %8 daha yavaş | Toplam 75 düşman |
-| Nane | %25 pişirme, %20 temizlik hızı | Toplam 50 servis |
+| Mik | Balanced starting attributes | Available by default |
+| Zıp | 15% faster; +1 plate capacity | Complete 10 total servings |
+| Tok | +24 health; +15% weapon damage; 8% slower | Defeat 75 total enemies |
+| Nane | +25% cooking speed; +20% cleaning speed | Complete 50 total servings |
 
-Şef kıyafeti başlangıçta açıktır. Gezgin kıyafeti 10 servis, Muhafız 75 düşman, Kraliyet ilk zafer ile açılır. Kıyafetler kozmetiktir; karakter bonuslarını değiştirmez. Altı başarımın koşulları, ilerlemesi ve ödülleri menüde görünür. Açıldığında oyun içinde kısa bir bildirim gösterilir. Başarımlar koşular arasında birikir.
+The Chef outfit is unlocked by default. Traveler unlocks after 10 servings, Guardian after 75 defeated enemies, and Royal after the first victory. Outfits are cosmetic and do not modify character bonuses. Six achievements display their criteria, progress, and rewards in the menu. New achievements trigger a brief in-game notification and persist across runs.
 
-**Kalıcı bahşiş:** servis başına 1, her 10 düşmanda 1, zaferde 30; dördüncü vardiyaya ilk ulaşmada 20, ilk zor zaferde 50 ek bahşiş. Bu kasa koşu altını ve iki XP havuzundan ayrıdır. Can (+8), hareket (+%3), silah hasarı (+%5), pişirme (+%5), temizlik (+%5) eğitimlerinin her biri beş kademedir. Kademeler 10/20/30/40/50 bahşiş tutar; bonuslar yeni koşuda uygulanır ve eşya slotu kullanmaz. Aynı eğitimin kademeleri toplanır, karakter bonusuyla çarpılır.
+**Persistent tips:** Earn 1 tip per serving, 1 per 10 defeated enemies, and 30 for a victory, plus 20 for reaching shift four for the first time and 50 for the first victory on Hard. This persistent currency is separate from run-specific gold and the two XP pools. Five training categories—health (+8), movement (+3%), weapon damage (+5%), cooking (+5%), and cleaning (+5%)—each have five tiers costing 10/20/30/40/50 tips. Training bonuses apply to future runs without occupying equipment slots. Tiers of the same training stack and multiply with the character's bonus.
+Difficulty	Enemy health	Damage	Speed	Extra enemies per wave	Unlock condition
+Lunch	×1	×1	×1	0	Available by default
+Rush Hour	×1.35	×1.25	×1.15	2	Available by default
+Nightmare	×1.8	×1.6	×1.3	4	First victory
 
-| Zorluk | Düşman canı | Hasar | Hız | Akın başına ek düşman | Açılış |
-| --- | --- | --- | --- | --- | --- |
-| Öğle | ×1 | ×1 | ×1 | 0 | Başlangıç |
-| Yoğun mesai | ×1,35 | ×1,25 | ×1,15 | 2 | Başlangıç |
-| Kâbus | ×1,8 | ×1,6 | ×1,3 | 4 | İlk zafer |
+The profile is stored at user://mik_profile.cfg, separate from the older high-gold record. A modified profile is saved at least once every three seconds, as well as at the end of a run, on restart, and on normal window closure. Abrupt process termination may result in the loss of up to three seconds of recent progress. New features do not erase the older score record. Achievements are local; there is no Steam or other platform integration.
 
-Profil `user://mik_profile.cfg` içinde, eski altın rekorundan ayrı tutulur. Kirli profil en geç üç saniyede bir, koşu sonu, yeniden başlama ve normal pencere kapanışında kaydedilir. Ani işlem sonlandırmada son üç saniyelik ilerleme kaybolabilir. Yeni özellikler eski rekor kaydını silmez. Başarımlar yereldir; Steam/platform entegrasyonu içermez.
+## Large map and camera
+The restaurant courtyard measures 64 × 52 units, with ten tables and a kitchen pavilion. Tables are at least eight units apart. The camera retains the earlier 23.5 orthographic size and viewing angle, follows the character smoothly, and does not zoom out to show the entire map at once.
 
-## Büyük harita ve kamera
+Circular customer portraits, direction arrows, food/action icons, and patience rings appear near the screen edges. Tables use symbols-an order pad, oven, plate, cutlery, and sponge-instead of text. The top-left HUD contains six kitchen slots, six combat slots, and separate XP bars; hovering over an item displays its description.
 
-64 × 52 birimlik restoran bahçesi, on masa ve mutfak pavyonu. Masalar arasında en az 8 birim vardır. Kamera önceki sürümdeki **23,5 ortografik boyutu ve bakış açısını** korur; karakteri yumuşakça izler. Haritanın tamamını aynı anda göstermek için uzaklaşmaz.
+Map upgrades can be combined in a single run: a boulevard that removes central dividers, a speed lane between the kitchen and courtyard, and mouse tunnels connecting the outer wings.
 
-Ekran kenarında yuvarlak müşteri portreleri, yön okları, yemek/işlem rozetleri ve sabır halkaları görünür. Masalarda metin yerine sipariş defteri, fırın, tabak, çatal-kaşık ve sünger sembolleri kullanılır. Sol üstte mutfak ve savaş için altışar eşya slotu ve ayrı XP çubukları vardır. Eşya üzerine gelince açıklaması açılır.
+## Automated restaurant workflow
+1. Approach a table and pause briefly to take the order automatically.
+2. The kitchen cooks the food automatically. Approach the counter to collect ready dishes on your tray.
+3. Approach the corresponding table to serve the dish in a short arc; the customer begins eating.
+4. Once the meal is finished, earn gold, kitchen XP, and 4 health. Approach the dirty table to clean it.
+Cheeseburgers, vegetable pizzas, pumpkin soup, and cheese platters have distinct 3D models. The same dish appears in the kitchen, on the tray, and at the table. Food emits steam and portions visibly shrink as customers eat; customers have hand-to-mouth and chewing animations. Selecting an upgrade card triggers a short mouse hop, glowing rings, and spark effects.
+Surrounding enemy swarms
+Enemies spawn off-camera from eight sectors surrounding the player, instead of entering individually through two gates. Each run begins with eight seconds of preparation time, and enemies take additional time to approach. Waves contain 4–9 animals, with shorter intervals as shifts progress. Up to 96 regular enemies and a final boss can be active.
 
-Yol yükseltmeleri aynı haritada birleştirilir: orta bölmeleri kaldıran bulvar, mutfaktan bahçeye uzanan hız hattı, iki dış kanadı bağlayan fare tünelleri.
-
-## Otomatik restoran döngüsü
-
-1. Masaya yaklaş ve kısa süre dur: sipariş alınır.
-2. Mutfak kendi pişirir. Tezgâhın önüne yaklaşınca hazır yemekleri tepsine alırsın.
-3. İlgili masaya yaklaş: tabak masaya yay çizerek gider, müşteri yemeye başlar.
-4. Yemek bitince altın, mutfak XP’si ve 4 can kazanırsın. Kirli masaya yaklaşarak temizle.
-
-Peynir burger, sebzeli pizza, balkabağı çorbası ve peynir tabağı ayrı 3D modellerdir. Aynı yemek mutfakta, tepside ve masada görünür. Buhar çıkar, porsiyonlar yenildikçe azalır; müşteriler el–ağız ve çiğneme animasyonu yapar. Kart seçiminden sonra farede kısa sıçrama, ışık halkaları ve kıvılcım animasyonu oynar.
-
-## Çevreleyen hayvan sürüleri
-
-Düşmanlar iki kapıdan tek tek değil, karakterin çevresindeki sekiz sektörden kamera dışında doğar. Açılışta 8 saniye hazırlık verilir; düşmanların yaklaşması ayrıca zaman alır. Her akında 4–9 hayvan gelir, akın aralıkları vardiyalarla kısalır. En fazla 96 normal hayvan ve final boss’u bulunur.
-
-| Vardiya | Sürü |
+| Shift | Enemy wave |
 | --- | --- |
-| 1 | Sokak kedileri |
-| 2 | Kedi ve sokak köpeği |
-| 3 | Kara kediler ve sopalı insanlar |
-| 4 | Zırhlı buldoglar ve sopalı insanlar |
-| 5 | Tilkiler ve daha kalabalık insan grupları |
-| 6 | Karışık alfa sürüsü ve Kazan Kıran adlı büyük buldog |
+| 1 | Stray cats |
+| 2 | Cats and stray dogs |
+| 3 | Black cats and club-wielding humans |
+| 4 | Armored bulldogs and club-wielding humans |
+| 5 | Foxes and larger groups of humans |
+| 6 | Mixed alpha swarm and a giant bulldog boss named Kazan Kıran |
 
-Hayvanlar mobilyaları dolaşır ve birbirlerinden ayrılarak yaklaşır. Kırmızı halka, kısa hazırlıktan sonra gerçekleşecek saldırıyı gösterir. Dash veya hareketle dışına çık. Hasardan sonra kısa dokunulmazlık vardır.
 
-## İki ayrı XP, iki ayrı seçim
+Enemies navigate around furniture and spread apart as they approach. A red ring telegraphs an incoming attack after a brief wind-up. Dodge it by moving or dashing. The player receives a short invulnerability period after taking damage.
 
-**Mutfak XP’si (yeşil):** tamamlanan yemekten gelir. Normal servis 2, öğrenci servisi 3 XP verir. Sadece karakterin servis özellikleri, restoran, müşteri ve yol kartları sunulur.
+## Separate XP pools and upgrade choices
+**Kitchen XP (green):** Earned by completing meals. Standard servings grant 2 XP and student servings grant 3 XP. This pool offers character service traits, restaurant, customer, and pathway upgrade cards.
 
-**Savaş XP’si (mor):** yalnızca canavar yenmekten gelir. Normal hayvan 4, buldog 8, boss 30 XP verir. Yalnızca silah/savaş kartları sunulur. Canavar öldürmek altın veya mutfak XP’si kazandırmaz.
+**Combat XP (purple):** Earned only by defeating monsters. Regular animals grant 4 XP, bulldogs 8 XP, and the boss 30 XP. This pool offers weapon and combat cards only. Monster kills do not grant gold or kitchen XP.
 
-İki havuzun seviyesi, eşiği ve HUD çubuğu ayrıdır. Aynı anda kazanılan seviyeler kaynaklarıyla birlikte sıraya alınır. Seçim sırasında dünya, sabır, kamera, animasyonlar ve savaş durur. İlk savaş seviyesinde üç seçenek de yeni silahtır: bıçak, tava veya biber.
+Each pool has its own level, threshold, and HUD progress bar. Simultaneous level-ups are queued with their originating pool. While an upgrade choice is open, the world simulation, customer patience, camera, animations, and combat pause. At the first combat level-up, all three choices introduce a new weapon: knives, pans, or peppers.
 
-### Otomatik silahlar
+## Automatic weapons
+- **Soda:** Starting weapon; fires toward the nearest target in range.
+- **Chef knives:** Automatically thrown knives that pierce multiple enemies; higher levels increase knife count and damage.
+- **Spinning pans:** Orbit the chef and deal contact damage; additional levels add more pans.
+- **Hot pepper:** Leaves damaging, slowing clouds along the player's movement path.
+- **Combat support:** Soda pressure, fire rate, weapon range, overall damage, and a defense bell triggered by restaurant service.
+There are 25 upgrade cards in total: 17 kitchen/service cards and 8 combat cards. The starting soda weapon uses one combat slot. When empty slots exist, new items are offered; once slots are filled, upgrades for existing items are offered instead. Equipment can reach level IV; customer and pathway unlocks have one level each.
 
-- **Soda:** başlangıç silahı; menzildeki en yakın hedefe yönelen atış.
-- **Şef bıçakları:** otomatik atılan, birden fazla hayvanı delen bıçaklar. Seviye arttıkça sayı ve hasar artar.
-- **Dönen tavalar:** şefin etrafında dönerek temas hasarı verir. Ek seviyeler ek tava getirir.
-- **Acı biber:** hareket rotanda kalan, hasar veren ve yavaşlatan bulutlar.
-- **Savaş destekleri:** soda basıncı, atış hızı, silah menzili, genel hasar ve servisle tetiklenen savunma zili.
+Foam Master IV unlocks the Dishwashing Fairy; Balance Master IV unlocks the Serving Conveyor. An evolution card is offered only once per run and will not reappear if declined. Choosing it replaces the corresponding base item in its slot. The Dishwashing Fairy remotely cleans a table every seven seconds, and the Serving Conveyor collects ready plates from a distance. Before these evolutions, players must approach the kitchen or dirty tables themselves.
 
-Toplam 25 kart: 17 mutfak/servis ve 8 savaş kartı. Başlangıç sodası bir savaş slotunu kullanır. Boş slotlar varken yeni eşya, dolduktan sonra sahip olunan eşyaların yükseltmeleri sunulur. Eşyalar en fazla IV seviyedir; müşteri ve yol açılımları tek seviyedir.
+The mouse displays an order pad when taking orders and a sponge when cleaning, with corresponding hand movements. Other animations include collecting and serving plates, walking, eating, and gaining power. Human enemies telegraph attacks by raising their clubs.
 
-Köpük ustası IV, Bulaşık perisini; Denge ustası IV, Servis bandını açar. Evrim kartı yalnızca bir kez sunulur; seçilmezse bu koşuda tekrar gelmez. Seçilirse temel eşyanın slotunu devralır. Bulaşık perisi 7 saniyede uzaktan temizler, Servis bandı hazır tabakları uzaktan tepsiye alır. Bu evrimlerden önce mutfak ve kirli masalara yaklaşmak gerekir.
+## Run completion and save data
+Six shifts become progressively harder. Win by completing the final shift and defeating Kazan Kıran. A run ends in defeat if the chef's health or the restaurant's reputation reaches zero. Levels and weapons reset at the beginning of each new run. The highest gold score is stored in user://mik_mik.cfg; gold is a run score in this version and is not spent as XP.
 
-Sipariş alırken defter, temizlerken sünger görünür; fare ellerini hareket ettirir. Tabak alıp servis ederken kısa kol hareketi, yürürken adımlar, yemek ve güç kazanma animasyonları vardır. İnsanlar sopayı kaldırarak saldırılarını belli eder.
+## Source code and tests
+- scripts/game.gd: World, camera, service flow, UI, and dual-XP progression.
+- scripts/monster_system.gd: Enemy models, swarms, navigation, and weapons.
+- scripts/order_indicators.gd: Off-screen order and patience indicators.
+- scripts/food_visual.gd and scripts/power_effect.gd: Food presentation and animations.
+No external package or model downloads are required. The large ground surface uses MultiMesh, and swarm separation uses spatial cells.
 
-## Koşu sonu ve kayıt
-
-Altı vardiya giderek zorlaşır. Kazanmak için son vardiyayı tamamlayıp Kazan Kıran’ı yen. Şefin canı veya restoranın itibarı sıfıra düşerse kaybedersin. Yeni koşuda seviyeler ve silahlar sıfırlanır; en yüksek altın rekoru `user://mik_mik.cfg` içinde saklanır. Altın bu sürümde koşu skorudur; XP yerine kullanılmaz.
-
-## Kaynaklar ve testler
-
-- `scripts/game.gd`: dünya, kamera, servis, UI ve iki kaynaklı ilerleme.
-- `scripts/monster_system.gd`: hayvan modelleri, sürüler, yön bulma ve silahlar.
-- `scripts/order_indicators.gd`: ekran dışı sipariş/sabır kartları.
-- `scripts/food_visual.gd`, `scripts/power_effect.gd`: yemekler ve animasyonlar.
-
-Harici paket veya model indirmesi gerekmez. Büyük zeminde MultiMesh, sürü ayrışmasında uzamsal hücreler kullanılır.
-
-```sh
+```bash
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . -- --smoke-test
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script res://tests/features_test.gd
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --script res://tests/swarm_test.gd
 ```
 
-İlk test gerçek fizik kareleriyle WASD, dash, çarpışma ve servis zincirini doğrular. Diğerleri yemek/animasyon testleri, büyük harita erişimi, sabit yakınlıkta kamera takibi, çok yönlü kamera dışı doğum, tür değişimleri, XP ayrımı, bıçak/tava/biber isabeti, sipariş kartları ve 30 saniyelik sürü simülasyonunu kapsar. Testler oyuncu kaydına yazmaz.
+The smoke test checks WASD movement, dash, collision, and the service workflow over real physics frames. Other tests cover food and animations, access to the larger map, camera tracking at a fixed distance, multi-directional off-camera spawns, enemy variations, XP separation, knife/pan/pepper hits, order indicators, and a 30-second swarm simulation. Tests do not alter player save data.
 
-`tests/swarm_preview.gd`, gerçek Godot çizicisinde hazırlanmış bir stres/görsel test sahnesi çalıştırır; `captures/swarm/` içine animasyon kareleri ve `captures/` içine oyun/kart görüntüleri kaydeder. Bu önizlemede silahlar ve müşteriler görsel kontrol amacıyla önceden yerleştirilir.
+tests/swarm_preview.gd runs a visual/stress-test scene in the actual Godot renderer, exporting animation frames to captures/swarm/ and game/card screenshots to captures/. Weapons and customers are pre-positioned in this preview for visual inspection.
 
-Bu sürüm oynanabilir prototiptir; uzun süreli oyuncu dengelemesi henüz tamamlanmadı.
+**Development status:** This is a playable prototype; long-term gameplay balancing is still in progress.
 
-## Performans ölçümü
+## Performance profiling
+Wave models are now spawned across several frames rather than all at once. Static face/body details are merged into cached geometry, while moving limbs remain independent. tests/runtime_profile.gd measures frame times during active combat and the customer service loop in the actual renderer.
 
-Dalga modelleri artık tek karede topluca değil, karelere bölünerek oluşturulur. Düşmanların sabit yüz/gövde ayrıntıları önbellekli tek geometride birleştirilir; hareketli uzuvlar bağımsızdır. `tests/runtime_profile.gd` gerçek çiziciyle aktif savaş ve müşteri döngüsünde kare sürelerini ölçer. M2 üzerindeki örnek ölçümde çizim çağrısı 1598’den 1207’ye, doğum anındaki en yüksek simülasyon süresi 7,17 ms’den 3,68 ms’ye indi. Rastgele koşularda düşman sayıları farklıdır; bu sayılar kontrollü FPS garantisi değildir. Yaklaşık 118 ms’lik tekil uzun kare hâlâ gözlendi; tüm takılmaların giderildiği iddia edilmez.
+In an example run on an Apple M2, draw calls decreased from 1,598 to 1,207, and peak simulation time during spawning dropped from 7.17 ms to 3.68 ms. Enemy counts vary between randomized runs, so these figures are not controlled FPS guarantees. An isolated long frame of approximately 118 ms was still observed; this does not imply all stutters have been eliminated.
 
-`tests/loadout_test.gd` slot sınırları, evrim koşulları, tekrar sunulmama, seviye sınırları, insan dalgaları/saldırısı ve işlem animasyonlarını doğrular.
+tests/loadout_test.gd checks slot limits, evolution prerequisites, one-time offers, level caps, human waves/attacks, and interaction animations.
 
-`tests/profile_test.gd`: kalıcı kasa, satın alma maliyetleri/sınırları, başarım açılımları, kayıt–yükleme, renk/kıyafet seçimi, menü düğmeleri, dört karakter, yükseltilmiş can sınırı, zorluk etkileri ve tek seferlik zafer ödülleri. `tests/profile_preview.gd` yeni menülerin gerçek Godot görüntülerini üretir; test ilerlemesi oyuncu profiline yazılmaz.
+tests/profile_test.gd covers persistent tips, purchase prices and limits, achievement unlocks, save/load, color/outfit choices, menu controls, four characters, upgraded health limits, difficulty effects, and one-time victory rewards. tests/profile_preview.gd generates actual Godot screenshots of the new menus; test progress is not written to the player profile.
 
-## Görsel stil
+## Visual design
+Mouse characters feature layered eyes, brows, teeth, whiskers, cheeks, nose highlights, stitching, and buttons. Zıp has a slim frame, tall shoes, courier cap, and crossbody bag. Tok is broad-bodied with shoulder pads, gloves, and a belt. Nane carries a leaf-patterned headpiece, herb bag, and bottles. Mik wears a double-breasted chef coat and utensil holster. Cosmetic outfit choices are layered onto each character's base appearance.
 
-Farelerde çok katmanlı göz, kaş, diş, bıyık, yanak, burun parıltısı, dikiş ve düğme detayları bulunur. Zıp ince gövdeli, uzun ayakkabılı, kurye şapkalı ve çapraz çantalıdır. Tok geniş gövdeli, omuzluklu, eldivenli ve kemerlidir. Nane yapraklı başlık, ot çantası ve şişeler taşır. Mik çift sıra düğmeli şef kıyafeti ve gereç kılıfı kullanır. Seçilen kozmetik kıyafet karakterin temel görünümüne eklenir.
+Tables include runners, trim rings, napkins, cutlery, spice jars, and embroidered cushions; kitchen details include shelves, jars, stacks of plates, oven bricks, and pot handles. Planters feature flowers and leaf veins. Food details include toasted buns, sesame seeds, lettuce, pizza crust and mushrooms, soup garnish, and grapes/crackers. Enemy faces, collars, armor, and clothing have also been refined.
 
-Masalara örtü şeridi, kenar halkası, peçete, çatal, baharatlık ve işlemeli minder; mutfağa raf, kavanoz, tabak istifi, fırın tuğlaları ve tencere sapları eklendi. Saksılar çiçekli ve damarlı; yiyeceklerde kızarmış ekmek, susam, marul, pizza kenarı/mantar, çorba garnitürü ve üzüm/kraker ayrıntıları vardır. Düşmanlarda yüz, yaka, zırh ve kıyafet detayları iyileştirildi. Sabit süslemeler ve yenebilir porsiyonlar birleştirilmiş geometri kullanır; porsiyon görünürlüğü ve animasyonlar bağımsız kalır.
+Static decorations and edible portions use merged geometry, while visibility and animations of individual portions remain independent. Faces, outfit details, planters, and table decorations use cached combined geometry. Customer face geometry is prepared before a run begins, avoiding first-use merging work when new customers arrive.
 
-`tests/style_test.gd` ESC ile duraklama/devam, tuş tekrarı, dört renk paleti, göz şekilleri, karakter görünümü ve ayrıntılı yemeklerin yenmesini doğrular.
+tests/style_test.gd verifies Esc pause/resume, key repeat behavior, four-color palettes, eye shapes, character appearance, and consumption of detailed food models.
 
-## GitHub çalışma düzeni
+## Project ownership and licensing
+**Project owners:** Merve Sena Çınar & Ali Erdem Cerrah
+**Copyright:** © 2026 Merve Sena Çınar and Ali Erdem Cerrah.
 
-Özel repo: https://github.com/mervesenacnr/mik-mik-restaurant . `mervesenacnr` repo sahibidir. İlk aktarım `main` üzerindedir; sonraki her güncelleme yeni bir `codex/<değişiklik>` branch üzerinde test edilip commit ve push edilir. Merge ve görünürlük değişikliği ayrıca istenmedikçe yapılmaz. Çalışma tercihi `AGENTS.md` içinde de kayıtlıdır.
+This repository is public and source-available under the PolyForm Noncommercial License 1.0.0, not an unrestricted or OSI-approved open-source license. Commercial use requires separate written permission from both copyright holders. Third-party materials remain subject to their respective licenses and ownership rights.
 
-Yüzler, kıyafet ayrıntıları, saksılar ve masa süslemeleri önbellekli birleştirilmiş geometri kullanır. Müşteri yüzleri koşu başlamadan hazırlanır; yeni müşteri geldiğinde ilk kez geometri birleştirme yükü oluşmaz.
+For the separate browser-based implementation of the same game, visit the Three.js edition.
