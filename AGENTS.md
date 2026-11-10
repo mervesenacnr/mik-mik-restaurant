@@ -5,7 +5,7 @@
 - Repository: `mervesenacnr/mik-mik-restaurant`; PUBLIC and source-available under the PolyForm Noncommercial License 1.0.0. Commercial use requires separate written permission from both project owners: Merve Sena Çınar and Ali Erdem Cerrah.
 - The initial project import may be on `main`.
 - For each subsequent update, create a NEW descriptive `codex/<change>` branch before editing. Do not reuse a previous feature branch or commit updates directly to `main`.
-- Validate the change, commit the relevant project files, then push the new branch to this private repository. The user has explicitly authorized this routine branch-and-push workflow; do not request permission again.
+- Validate the change, commit the relevant project files, then push the new branch to this public repository. The user has explicitly authorized this routine branch-and-push workflow; do not request permission again.
 - Report the branch name and link after pushing. Do not merge to `main`, force-push, delete branches, change repository visibility, or change collaborators unless requested.
 - `mervesenacnr` is the repository owner and already has full access.
 
